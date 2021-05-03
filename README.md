@@ -1,4 +1,4 @@
-# aoc2020
+# Advent of Code 2020 in Clojure
 
 Here come my solutons to [The Advent of Code 2020](https://adventofcode.com/2020) in clojure.
 
@@ -12,5 +12,4 @@ lein repl
 ```
 
 ## License
-
 Do whatever you want.
