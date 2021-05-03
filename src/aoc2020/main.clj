@@ -1,5 +1,8 @@
 (ns aoc2020.main
-  (:require [aoc2020.problem1 :as p1]))
+  (:require [aoc2020.problem1 :as p1]
+            [clojure.string :as string]))
 
 (defn main []
-   (println "Problem 01: "  p1/solution))
+   (print 
+     (string/join "\n" (list (str "Problem 01/1: "  p1/solution1)
+                             (str "Problem 01/2: "  p1/solution2)))))
