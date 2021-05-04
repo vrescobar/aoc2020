@@ -13,6 +13,7 @@
   :repl-options {:port 9000
                  :host "localhost"
                  ;:middleware [whidbey.plugin/repl-pprint]
-                 :init-ns aoc2020.repl})
+                 ;:init-ns aoc2020.repl
+                 })
                  
                  
