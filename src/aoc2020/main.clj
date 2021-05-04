@@ -7,4 +7,5 @@
    (print 
      (string/join "\n" (list (str "Problem 01/1: "  p1/solution1)
                              (str "Problem 01/2: "  p1/solution2)
-                             (str "Problem 02/1: "  p2/solution1)))))
+                             (str "Problem 02/1: "  p2/solution1)
+                             (str "Problem 02/2: "  p2/solution2)))))
