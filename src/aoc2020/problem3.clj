@@ -1,12 +1,11 @@
 (ns aoc2020.problem3
   (:require
-   [clojure.string :as str]
-   [clojure.math.combinatorics :as combo]))
+   [clojure.string :as str]))
 
+#_(use 'clojure.tools.trace)
 
-(def text (slurp "resources/problem3.txt"))
-(def demo
-"..##.......
+#_(def demo
+  "..##.......
 #...#...#..
 .#....#..#.
 ..#.#...#.#
@@ -18,27 +17,33 @@
 #...##....#
 .#..#...#.#")
 
-(defn horizontal-drops [drops]
-  (fn [row col]
-  (first (drop (* row drops) col))))
-(def repeating-schema 
-  (cycle (partition 2 (interleave [1 3 5 7 1] [1 1 1 1 2]))))
+(def text (slurp "resources/problem3.txt"))
+(def vt (map cycle (str/split-lines text)))
 
+(defn generalized-problem [hdrops vdrops vt]
+  (let [max_length (count vt)
+        alg-steps (partition 2
+                             (interleave
+                              (map #(* hdrops %1) (iterate inc 0))
+                              (map #(* vdrops %1) (range (inc (int (/ max_length vdrops)))))))
+        matches (map (fn [[h v]]
+                       (nth (nth vt v) h))
+                     alg-steps)]
+    (count
+     (filter #(= \# %) (take (count vt) matches)))))
 
-(defn generalized-problem [h d t]
- (let [drop-pattern (horizontal-drops h)
-       amount-drops d]
-   (->> t
-        (map cycle)
-        (map-indexed drop-pattern)
-        (drop amount-drops)
-        (filter #(= \# %))
-        (count))))
+(defn problem1 [vt]
+  (generalized-problem 3 1 vt))
 
-(defn problem1 [t]
-  (generalized-problem 3 1 t))
+(defn problem2 [vt]
+  (let [args [(generalized-problem 1 1 vt)
+              (generalized-problem 3 1 vt)
+              (generalized-problem 5 1 vt)
+              (generalized-problem 7 1 vt)
+              (generalized-problem 1 2 vt)]]
+    (reduce * args)))
 
-(let [t (str/split-lines demo)]
-  (def solution1 (problem1 t)) ;; problem 1 generalized
-  (def solution2 "Nope"))
+(def solution1 (problem1 vt))
+(def solution2 (problem2 vt))
 
++
