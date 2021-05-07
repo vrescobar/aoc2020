@@ -2,6 +2,7 @@
   (:require [aoc2020.problem1 :as p1]
             [aoc2020.problem2 :as p2]
             [aoc2020.problem3 :as p3]
+            [aoc2020.problem4 :as p4]
             [clojure.string :as string]))
 
 (defn main []
@@ -12,4 +13,5 @@
                              (str "Problem 02/2: "  p2/solution2)
                              (str "Problem 03/1: "  p3/solution1)
                              (str "Problem 03/2: "  p3/solution2)
+                             (str "Problem 04/1: "  p4/solution1)
                              ))))
