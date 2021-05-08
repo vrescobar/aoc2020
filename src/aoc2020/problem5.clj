@@ -26,3 +26,9 @@
             (= [{:row 102, :column 4} 820] (tester "BBFFBBFRLL"))])))
 
 (def solution1 (str (first (sort > (map sit-id input)))))
+(def solution2
+  (let [col (sort < (map sit-id input))
+        pairs (partition 2 (interleave col (rest col)))
+        finder (fn [[prev cur]] (not= (inc prev) cur))]
+    ;; filter still has cost N rather than log()
+    (inc (first (first (filter finder pairs))))))
