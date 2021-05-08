@@ -3,6 +3,7 @@
             [aoc2020.problem2 :as p2]
             [aoc2020.problem3 :as p3]
             [aoc2020.problem4 :as p4]
+            [aoc2020.problem5 :as p5]
             [clojure.string :as string]))
 
 (defn main []
@@ -15,4 +16,6 @@
                              (str "Problem 03/2: "  p3/solution2)
                              (str "Problem 04/1: "  p4/solution1)
                              (str "Problem 04/2: "  p4/solution2)
+                             (str "Problem 05/1: "  p5/solution1)
+            
                              ))))
