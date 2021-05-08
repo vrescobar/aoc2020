@@ -14,4 +14,5 @@
                              (str "Problem 03/1: "  p3/solution1)
                              (str "Problem 03/2: "  p3/solution2)
                              (str "Problem 04/1: "  p4/solution1)
+                             (str "Problem 04/2: "  p4/solution2)
                              ))))
