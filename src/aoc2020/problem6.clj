@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]
    ; [clojure.core.match :refer [match]]
-   ))
+   [clojure.set :as set]))
 
 (def text (slurp "resources/problem6.txt"))
 
@@ -22,3 +22,26 @@
 
 (def solution1 (str (problem1 text)))
 
+;;;;;; problem 2 ;;;;;;
+(def demo2 "abc
+
+a
+b
+c
+
+ab
+ac
+
+a
+a
+a
+a
+
+b")
+
+(defn problem2 [text]
+ (reduce +
+         (map count (map #(reduce set/intersection %)
+                         (map (partial map #(into #{} %)) (parse-input text))))))
+
+(def solution2 (str (problem2 text)))
