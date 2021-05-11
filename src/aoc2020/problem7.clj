@@ -1,13 +1,15 @@
 (ns aoc2020.problem7
   (:require
    [clojure.string :as str :refer [split-lines]]
-   [loom.graph :as loom :refer [weighted-digraph predecessors*]]
+   [loom.graph :as loom :refer [weighted-digraph predecessors* weight*]]
    [loom.io :refer [view]]
    [clojure.core.match :refer [match]]
-   [clojure.set :as set]))
-   
+   [clojure.set :as set]
+   [clojure.test :refer [testing is]]
+   ))
+
 (def text (slurp "resources/problem7.txt"))
-#_(def demo1 "light red bags contain 1 bright white bag, 2 muted yellow bags.
+(def demo1 "light red bags contain 1 bright white bag, 2 muted yellow bags.
 dark orange bags contain 3 bright white bags, 4 muted yellow bags.
 bright white bags contain 1 shiny gold bag.
 muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
@@ -17,10 +19,7 @@ vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags.")
 
-(def f (split-lines text))
-
 ;; Grammar defition (small incremental parser.)
-
 (let [;; Incrmental parser definitions
       blank "\\s"
       rest-of-sentence "(.*)"
@@ -65,7 +64,7 @@ dotted black bags contain no other bags.")
     (cond
       ;; Base case: a bag without children
       (and (= [] v)
-           (= coll '())) (list [k])
+           (= coll '())) (list k)
       ;; Recursion base case: no more children
       (= [] v) coll
       :else (let [child-bag (first v)
@@ -73,18 +72,18 @@ dotted black bags contain no other bags.")
               (recur k
                      (drop 2 v)
                      (cons [k child-bag amount] coll))))))
-;; test cases
-(comment
-  (every? true? [(= (grammar "light red bags contain 1 bright white bag, 2 muted yellow bags.")
-                    {:light_red [:bright_white 1 :muted_yellow 2]})
-                 (= (grammar "faded blue bags contain no other bags.")
-                    {:faded_blue []})
-                 ;; Ast tests
-                 (= (ast->loomWDG
-                     {:light_red [:bright_white 1 :muted_yellow 2]})
-                    (list [:light_red :muted_yellow 2] [:light_red :bright_white 1]))
-                 (= (ast->loomWDG {:faded_blue []})
-                    (list [:faded_blue]))]))
+(testing
+  (testing "Grammar parsing"
+   (is (= (grammar "light red bags contain 1 bright white bag, 2 muted yellow bags.")
+          {:light_red [:bright_white 1 :muted_yellow 2]}))
+    (is (= (grammar "faded blue bags contain no other bags.")
+           {:faded_blue []})))
+  (testing "AST transformation test"
+    (is (= (ast->loomWDG
+            {:light_red [:bright_white 1 :muted_yellow 2]})
+           (list [:light_red :muted_yellow 2] [:light_red :bright_white 1])))
+    (is (= (ast->loomWDG {:faded_blue []})
+           (list :faded_blue)))))
 
 (defn graph-problem1 [text]
   (apply weighted-digraph
@@ -92,7 +91,6 @@ dotted black bags contain no other bags.")
                  (map (comp ast->loomWDG grammar)
                       (split-lines text)))))
 
-;(view wgd) ;; Generate png with GraphViz and open PNG
 (defn total_predecessors [g edge]
   (let [preds (predecessors* g edge)]
     (reduce set/union
@@ -100,4 +98,57 @@ dotted black bags contain no other bags.")
             (map #(total_predecessors g %) preds))))
 
 (def solution1 (str (count (total_predecessors (graph-problem1 text) :shiny_gold))))
-;(def solution2 "")
+
+(defn total_predecessors [g edge]
+  (let [preds (predecessors* g edge)]
+    (reduce set/union
+            preds
+            (map #(total_predecessors g %) preds))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+(def demo2 "shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.")
+
+(defn childrenWeight 
+  ([graph node]
+   (let [weight (memoize #(weight* graph %1 %2))
+         children (memoize #(loom/successors graph %1))]
+     (childrenWeight weight children 1 node)))
+  ([weight children factor node]
+   (let [succs (children node)]
+     (if (empty? succs)
+       0 ;; no sub-bags
+       (reduce +
+               (concat
+                ;; A single collection of bags
+                (map #(* factor %)
+                     (map #(weight node %) succs))
+                ;; Multiple nested bags
+                (map (fn [sub-node]
+                       (childrenWeight weight children
+                                       (* factor (weight node sub-node)) sub-node))
+                     succs)))))))
+
+
+(def wgd (graph-problem1 demo1))
+;(view wgd) ;; Generate png with GraphViz and open PNG
+
+(def wgd2 (graph-problem1 demo2))
+;(view wgd2) 
+
+(testing "children weight test for demo text 1"
+  (is (= 0 (childrenWeight wgd :faded_blue)))
+  (is (= 0 (childrenWeight wgd :dotted_black)))
+  (is (= 11 (childrenWeight wgd :vibrant_plum)))
+  (is (= 7 (childrenWeight wgd :dark_olive)))
+  (is (= 32 (childrenWeight wgd :shiny_gold)))
+  (is (= 126 (childrenWeight wgd2 :shiny_gold))))
+
+
+(def solution2 (childrenWeight (graph-problem1 text) :shiny_gold))
