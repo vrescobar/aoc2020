@@ -7,6 +7,7 @@
                  [org.clojure/math.combinatorics "0.1.6"]
                  [org.clojure/tools.trace "0.7.11"]
                  [org.clojure/core.match "1.0.0"]
+                 [aysylu/loom "1.0.2"]
                  ; TODO: look why it is broken
                  ; https://github.com/greglook/whidbey
                  ;[mvxcvi/whidbey "2.2.1"]

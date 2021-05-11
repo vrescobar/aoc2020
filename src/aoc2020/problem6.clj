@@ -23,7 +23,7 @@
 (def solution1 (str (problem1 text)))
 
 ;;;;;; problem 2 ;;;;;;
-(def demo2 "abc
+#_(def demo2 "abc
 
 a
 b
