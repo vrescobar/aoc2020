@@ -108,7 +108,7 @@ acc +6")
               :state {:pos 0
                       :memory 0
                       :tape [["jmp" 2]]
-                      :prev_states []
+                      :prev_state []
                       :history []}}))
       (is (= (:exception (small-turing-machine (initial-state "nop +1\nnop +10\nacc +5\njmp +2\nnop -2\nacc -1\njmp -3")))
              :infinite-loop))
@@ -120,7 +120,8 @@ acc +6")
                    :memory 1
                    :tape [["acc" 1] ["jmp" -1]]
                    :history [0]
-                   :prev_states (list {:pos 0, :memory 0, :tape [["acc" 1] ["jmp" -1]], :history []})}}))
+                   :prev_state (list
+                                {:pos 0, :memory 0, :tape [["acc" 1] ["jmp" -1]], :history []})}}))
       (is
        (= 5 (get-in (small-turing-machine (initial-state demo1))
                     [:state :memory])))
@@ -131,17 +132,6 @@ acc +6")
 
 (def solution1 (str (get-in (small-turing-machine (initial-state text))
                             [:state :memory])))
-
-(def solution-demo1 "nop +0
-acc +1
-jmp +4
-acc +3
-jmp -3
-acc -99
-acc +1
-nop -4
-acc +6")
-
 (defn reverse-jmp-nop [op]
   (cond
     (= "jmp" op) "nop"
@@ -155,24 +145,19 @@ acc +6")
              (when (not= op "acc")
                (assoc tape i [(reverse-jmp-nop op) val]))))))
 
-           
 (defn multipatch-and-run [original-tape]
-  (lazy-seq
-   (filter (complement nil?)
-          (for [patched-tape (all-patched-variations original-tape)
-                :let [state {:pos 0 :memory 0 :tape patched-tape :history [] :prev_states []}
-                      execution (small-turing-machine state)]
-                ; while is not working as expected, I will do instead a lazy seq
-                ;:while (= (:exception execution) :boot-complete)
-                ]
-            (when (= (:exception execution) :boot-complete)
-              execution)))))
+  (let [mk-new-tape
+        (fn [tape] {:pos 0 :memory 0 :tape tape :history [] :prev_state []})]
+    (->> original-tape
+         all-patched-variations
+         (map mk-new-tape)
+         (map small-turing-machine)
+         (filter #(= :boot-complete (:exception %)))
+         (first)
+         (#(get-in % [:state :memory]))
+         (str))))
 
 (testing "patching demo tape and running it"
-  (is (= (get-in (first (multipatch-and-run (parsed demo1)))
-                 [:state :memory])
-         (get-in (small-turing-machine (initial-state solution-demo1))
-                 [:state :memory]))))
+  (is (= (multipatch-and-run (parsed demo1)) "8")))
 
-(def solution2 (str (get-in (first (multipatch-and-run (parsed text)))
-                            [:state :memory])))
+(def solution2 (multipatch-and-run (parsed text)))
