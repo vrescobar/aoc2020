@@ -26,4 +26,4 @@
                              (str "Problem 07/1: "  p7/solution1)
                              (str "Problem 07/2: "  p7/solution2)
                              (str "Problem 08/1: "  p8/solution1)
-                             #_(str "Problem 08/2: "  p8/solution2)))))
+                             (str "Problem 08/2: "  p8/solution2)))))
