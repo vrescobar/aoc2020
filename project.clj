@@ -12,11 +12,20 @@
                  ; https://github.com/greglook/whidbey
                  ;[mvxcvi/whidbey "2.2.1"]
                  ]
-  :main aoc2020.main/main
+  :main aoc2020.main
+  :aot [aoc2020.main]
   :repl-options {:port 9000
                  :host "localhost"
                  ;:middleware [whidbey.plugin/repl-pprint]
                  ;:init-ns aoc2020.repl
-                 })
-                 
-                 
+                 }
+  :profiles {:uberjar {:aot :all}
+             :dev {:plugins [[lein-shell "0.5.0"]]}}
+
+  :aliases
+  {"native"
+   ["shell"
+    "native-image" "--report-unsupported-elements-at-runtime"
+    "--initialize-at-build-time" "--no-server"
+    "-jar" "./target/${:uberjar-name:-${:name}-${:version}-standalone.jar}"
+    "-H:Name=./target/${:name}"]})
