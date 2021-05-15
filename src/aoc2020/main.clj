@@ -9,10 +9,10 @@
             [aoc2020.problem7 :as p7]
             [aoc2020.problem8 :as p8]
             [aoc2020.problem9 :as p9]
+            [aoc2020.problem10 :as p10]
             [clojure.string :as string :refer [join]]))
 
-(defn -main [& args]
-   (do
+(defn -main []
      (println "Advent of Code 2020!")
      (print
       (join "\n" (list (str "Problem 01/1: "  p1/solution1)
@@ -32,4 +32,6 @@
                        (str "Problem 08/1: "  p8/solution1)
                        (str "Problem 08/2: "  p8/solution2)
                        (str "Problem 09/1: "  p9/solution1)
-                       (str "Problem 09/2: "  p9/solution2))))))
+                       (str "Problem 09/2: "  p9/solution2)
+                       (str "Problem 10/1: "  p10/solution1)
+                       #_(str "Problem 10/2: "  p10/solution2)))))
