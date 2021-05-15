@@ -4,7 +4,7 @@
    [clojure.set :as set]
    [clojure.test :refer [testing is]]
    [clojure.string :refer [split-lines]]
-   [clojure.math.combinatorics :refer [combinations]]))
+   [clojure.math.combinatorics :as combo :refer [combinations]]))
 
 
 ; I should reach 22 joltage
@@ -34,29 +34,58 @@
 (def demo0 "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4")
 (def demo1 "28\n33\n18\n42\n31\n14\n46\n20\n48\n47\n24\n23\n49\n45\n19\n38\n39\n11\n1\n32\n25\n35\n8\n17\n7\n9\n4\n2\n34\n10\n3")
 
-(def parse (comp sort
-                 #(cons 0 %)
-                 ;#(cons 22 %)
-                 (partial map #(Integer/parseInt %))
-                 split-lines))
+(def prepare (comp sort
+                   #(cons 0 %)
+                   (partial map #(Integer/parseInt %))
+                   split-lines))
 
-(defn alg-steps[text]
-  (let [input (parse text)
-        deltas (map (fn [[a b]] (- b a))
+(defn alg-steps [input]
+  (let [deltas (map (fn [[a b]] (- b a))
                     (partition 2 1 input))]
     ;; We still need the last adaptor
     (cons 3 (take-while #(not= % (- 22 3)) deltas))))
 
 (defn problem1 [text]
-  (let [{ones 1, threes 3} (frequencies (alg-steps text))]
+  (let [{ones 1, threes 3} (frequencies (alg-steps (prepare text)))]
     (* ones threes)))
 
 (testing
  (testing "Demo 0"
    (is (= (problem1 demo0) 35)))
- (testing "Demo 1"
-  (is (= (problem1 demo1) 220))))
+  (testing "Demo 1"
+    (is (= (problem1 demo1) 220))))
 
 
 (def solution1 (str (problem1 text)))
-;(def solution2 "")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def prepare-p2 (comp sort
+                      (partial map #(Integer/parseInt %))
+                      split-lines))
+
+(defn adds-to-22 [input]
+  (->> input
+       (alg-steps)
+       (reduce +)
+       (= 22)))
+
+
+(def count-ways
+  (memoize
+   (fn
+     ([_] 1)
+     ([x y & zs]
+      (if (> (+ x y) 3)
+        ;skip one so this miss won't add up
+        (apply count-ways y zs)
+        ;add the possibility and the rest
+        (+ (apply count-ways y zs)
+           (apply count-ways (+ x y) zs)))))))
+
+(defn problem2 [text]
+  (let [input (prepare text)
+        deltas (map (fn [[a b]] (- b a))
+                    (partition 2 1 input))]
+    (apply count-ways deltas)))
+
+(def solution2 (str (problem2 text)))
