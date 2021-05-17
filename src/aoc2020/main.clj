@@ -10,6 +10,7 @@
             [aoc2020.problem8 :as p8]
             [aoc2020.problem9 :as p9]
             [aoc2020.problem10 :as p10]
+            [aoc2020.problem11 :as p11]
             [clojure.string :as string :refer [join]]))
 
 (defn -main []
@@ -34,4 +35,6 @@
                        (str "Problem 09/1: "  p9/solution1)
                        (str "Problem 09/2: "  p9/solution2)
                        (str "Problem 10/1: "  p10/solution1)
-                       (str "Problem 10/2: "  p10/solution2)))))
+                       (str "Problem 10/2: "  p10/solution2)
+                       (str "Problem 11/1: "  p11/solution1)
+                       #_(str "Problem 11/2: "  p11/solution2)))))
